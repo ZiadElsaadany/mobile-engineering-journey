@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Xcode local data and build output
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Language tool caches
+.dart_tool/
+.build/
