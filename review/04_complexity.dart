@@ -13,6 +13,13 @@
 // Distinguish the storage for the existing input from additional working storage.
 // Write your answer in English comments below.
 
+// ==================== ANSWER 1 ====================
+// Time: O(n), because the loop visits every element in lst once.
+// Auxiliary space: O(1), because sum and the loop variable use a fixed
+// amount of working storage. Updating sum does not create more variables.
+// The existing input list is excluded from auxiliary space.
+// ================== END ANSWER 1 ==================
+
 // QUESTION 2: Two sequential traversals
 // Suppose a report calls totalMinutes once and then countLongSessions once.
 // Both receive the same collection of n sessions.
@@ -20,6 +27,14 @@
 // State the total time complexity and auxiliary space.
 // Explain how calling two traversals sequentially affects your calculation.
 // Write your answer in English comments below.
+
+// ==================== ANSWER 2 ====================
+// Time: O(n). Each function traverses n sessions once, so the total work
+// is n + n = 2n. Big O ignores the constant factor of 2.
+// The traversals run sequentially, so their work is added, not multiplied.
+// Auxiliary space: O(1). Each function uses fixed working storage, and
+// the report stores only two scalar results. No growing collection is created.
+// ================== END ANSWER 2 ==================
 
 // QUESTION 3: Building a result collection
 // Analyze your sessionsBelowGoal implementation.
@@ -29,3 +44,15 @@
 // State auxiliary working space separately if you exclude the returned collection.
 // Explain whether the result can have the same length as the input.
 // Write your answer in English comments below.
+
+// ==================== ANSWER 3 ====================
+// Time: O(n). Every input session is checked once. Adding k selected
+// elements takes O(k) total amortized time; k <= n, so the total is O(n).
+// Result storage: O(k), where k is the number of selected sessions.
+// If every session is below the goal, k = n, so worst-case result space is O(n).
+// Equality does not qualify: only durations strictly below the goal are selected.
+// Auxiliary working space excluding the returned list: O(1).
+// The remaining loop state uses fixed storage regardless of n or k.
+// Including the returned list, worst-case extra space is O(n).
+// A final binding prevents reassignment; it does not prevent the list from growing.
+// ================== END ANSWER 3 ==================

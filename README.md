@@ -916,7 +916,123 @@ References: [Dart error handling](https://dart.dev/language/error-handling), [Sw
 
 ## Complexity basics
 
-Big O describes how resource use grows as the input grows. For a basket, let `n` be the number of items, not the sum of their quantities.
+Big O describes how resource use grows as the input grows. Time complexity tracks work; space complexity tracks storage. It does not specify an exact number of seconds or bytes. For a basket, let `n` be the number of items, not the sum of their quantities.
+
+These examples use the usual fixed-size integer model: reading, comparing, or updating one integer takes constant work and storage. Analyze the processing separately from constructing the existing input.
+
+### Constant work and fixed working storage
+
+Direct indexed access to one element does not visit all the preceding elements. Assume the input is nonempty.
+
+**Dart**
+
+~~~dart
+void main() {
+  final numbers = [10, 20, 30]; // Existing input.
+  final first = numbers[0];
+  print(first);
+}
+~~~
+
+**Swift**
+
+~~~swift
+let numbers = [10, 20, 30] // Existing input.
+let first = numbers[0]
+print(first)
+~~~
+
+Both print `10`. The indexed access and print take **O(1) time** under these assumptions. The extra `first` binding takes **O(1) auxiliary space**, regardless of the input length.
+
+### One traversal with an accumulator
+
+**Dart**
+
+~~~dart
+void main() {
+  final sessions = [15, 30, 45]; // Existing input.
+  var sum = 0;
+  for (final minutes in sessions) {
+    sum += minutes;
+  }
+  print(sum);
+}
+~~~
+
+**Swift**
+
+~~~swift
+let sessions = [15, 30, 45] // Existing input.
+var sum = 0
+for minutes in sessions {
+    sum += minutes
+}
+print(sum)
+~~~
+
+Both print `90`. Let `n` be the number of sessions:
+
+- **Time: O(n).** Each element is visited once.
+- **Auxiliary space: O(1).** The accumulator and loop state use a fixed amount of storage. Updating `sum` reuses storage; it does not retain a separate accumulator for every iteration. Constant space can contain several variables.
+- **Input storage is excluded.** The existing collection occupies O(n) space, but the traversal does not create that collection.
+
+The same reasoning applies to counting qualifying sessions with a scalar counter. A larger counter value does not mean that a growing collection is being stored.
+
+### Two sequential traversals
+
+Calling `totalMinutes` and then `countLongSessions` on the same `n` sessions performs two complete traversals. The work is added: `n + n = 2n`, which simplifies to **O(n)**. Two sequential traversals do not multiply their iteration counts.
+
+Each function uses constant working storage, and the report stores only two scalar results. The combined **auxiliary space is O(1)**.
+
+### Selecting elements into a new collection
+
+Let `n` be the number of input sessions and `k` be the number selected. The condition is strictly below the goal; a duration equal to the goal is excluded.
+
+**Dart**
+
+~~~dart
+void main() {
+  final sessions = [20, 100, 40]; // Existing input.
+  final goal = 90;
+  final result = <int>[];
+  for (final minutes in sessions) {
+    if (minutes < goal) {
+      result.add(minutes);
+    }
+  }
+  print(result);
+}
+~~~
+
+**Swift**
+
+~~~swift
+let sessions = [20, 100, 40] // Existing input.
+let goal = 90
+var result: [Int] = []
+for minutes in sessions {
+    if minutes < goal {
+        result.append(minutes)
+    }
+}
+print(result)
+~~~
+
+Both print `[20, 40]`. Here `n = 3` and `k = 2`.
+
+| Input sessions | Goal | Selected result | n | k |
+|---|---|---|---|---|
+| `[15, 60, 90]` | 60 | `[15]` | 3 | 1 |
+| `[10, 20, 30]` | 60 | `[10, 20, 30]` | 3 | 3 |
+| `[90, 100]` | 60 | `[]` | 2 | 0 |
+
+- **Time: O(n).** Every input element is checked once. Adding all `k` selected elements takes O(k) total amortized time. Since `k <= n`, the total remains O(n). An individual add or append may occasionally resize storage; it need not take constant time on every call.
+- **Result storage: O(k)** for the selected elements, with constant overhead even when empty. If every session is below the goal, `k = n`, giving **O(n) worst-case result storage**.
+- **Working space excluding the result: O(1).** The remaining variables and loop state do not grow with the input.
+
+State the space convention explicitly. A returned collection is often reported separately as output space. For `sessionsBelowGoal`, output space is O(k), and auxiliary working space excluding output is O(1). If the result is included in extra space, the worst case is O(n). If a growing collection is only temporary and is not returned, its storage counts as auxiliary space.
+
+In Dart, `final result` prevents assigning a different list to that variable; `add` can still grow the current list. It does not guarantee a particular physical memory address or fixed storage capacity. In Swift, appending to an `Array` changes its value, so `result` needs `var`. Binding keywords alone do not determine complexity; analyze the storage actually used.
 
 ### One pass through a basket
 
